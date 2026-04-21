@@ -1,0 +1,28 @@
+{
+  "name": "@rewdy/chatty-caddy",
+  "version": "0.1.0",
+  "description": "A CLI notebook for storing and running AI prompts",
+  "module": "src/cli.ts",
+  "type": "module",
+  "private": false,
+  "bin": {
+    "chatty-caddy": "./src/cli.ts",
+    "chaca": "./src/cli.ts"
+  },
+  "scripts": {
+    "start": "bun src/cli.ts",
+    "dev": "bun --hot src/cli.ts"
+  },
+  "dependencies": {
+    "@clack/prompts": "1.2.0",
+    "chalk": "5.6.2",
+    "fuse.js": "7.3.0",
+    "gray-matter": "4.0.3"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}
