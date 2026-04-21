@@ -31,7 +31,7 @@ export async function openInEditor(initialContent = ""): Promise<string | null> 
         chalk.bold("$EDITOR") +
         chalk.red(" environment variable (e.g. ") +
         chalk.dim("export EDITOR=nano") +
-        chalk.red(") and try again.")
+        chalk.red(") and try again."),
     );
     return null;
   }
@@ -43,7 +43,7 @@ export async function openInEditor(initialContent = ""): Promise<string | null> 
 
   p.log.step(
     chalk.cyan(`Opening in ${chalk.bold(editorName)}`) +
-      chalk.dim(" — save and close the file when done.")
+      chalk.dim(" — save and close the file when done."),
   );
 
   // Small pause so the user can read the message before the editor takes over
@@ -66,7 +66,9 @@ export async function openInEditor(initialContent = ""): Promise<string | null> 
 
   p.log.success(
     chalk.green("Content captured") +
-      chalk.dim(` — ${trimmed.split("\n").length} line${trimmed.split("\n").length !== 1 ? "s" : ""}`)
+      chalk.dim(
+        ` — ${trimmed.split("\n").length} line${trimmed.split("\n").length !== 1 ? "s" : ""}`,
+      ),
   );
 
   return trimmed;

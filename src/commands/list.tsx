@@ -32,7 +32,15 @@ function fuzzyFilter(prompts: Prompt[], query: string): Prompt[] {
 
 // ─── Table row ────────────────────────────────────────────────────────────────
 
-function Row({ prompt, isSelected, index }: { prompt: Prompt; isSelected: boolean; index: number; }) {
+function Row({
+  prompt,
+  isSelected,
+  index,
+}: {
+  prompt: Prompt;
+  isSelected: boolean;
+  index: number;
+}) {
   const bg = isSelected ? "cyan" : undefined;
   const fg = isSelected ? "black" : "white";
   const dim = isSelected ? "black" : undefined;
@@ -68,7 +76,10 @@ function Row({ prompt, isSelected, index }: { prompt: Prompt; isSelected: boolea
 function Header() {
   return (
     <Box marginBottom={1}>
-      <Text backgroundColor="cyan" color="black" bold> chatty-caddy </Text>
+      <Text backgroundColor="cyan" color="black" bold>
+        {" "}
+        chatty-caddy{" "}
+      </Text>
       <Text color="cyan"> your saved prompts</Text>
     </Box>
   );
@@ -76,11 +87,34 @@ function Header() {
 
 function TableHeader() {
   return (
-    <Box borderStyle="single" borderBottom={true} borderTop={false} borderLeft={false} borderRight={false}>
-      <Box width={4}><Text> </Text></Box>
-      <Box width={32}><Text bold color="cyan"> Label</Text></Box>
-      <Box width={42}><Text bold color="cyan"> Description</Text></Box>
-      <Box width={14}><Text bold color="cyan"> Created</Text></Box>
+    <Box
+      borderStyle="single"
+      borderBottom={true}
+      borderTop={false}
+      borderLeft={false}
+      borderRight={false}
+    >
+      <Box width={4}>
+        <Text> </Text>
+      </Box>
+      <Box width={32}>
+        <Text bold color="cyan">
+          {" "}
+          Label
+        </Text>
+      </Box>
+      <Box width={42}>
+        <Text bold color="cyan">
+          {" "}
+          Description
+        </Text>
+      </Box>
+      <Box width={14}>
+        <Text bold color="cyan">
+          {" "}
+          Created
+        </Text>
+      </Box>
     </Box>
   );
 }
@@ -89,12 +123,20 @@ function Footer({ count, total }: { count: number; total: number }) {
   return (
     <Box marginTop={1}>
       <Text color="gray">
-        {count < total ? `${count} of ${total} prompts` : `${total} prompt${total !== 1 ? "s" : ""}`}
+        {count < total
+          ? `${count} of ${total} prompts`
+          : `${total} prompt${total !== 1 ? "s" : ""}`}
         {"  "}
       </Text>
-      <Text color="gray" dimColor>↑↓ navigate  </Text>
-      <Text color="gray" dimColor>enter select  </Text>
-      <Text color="gray" dimColor>ctrl+c exit</Text>
+      <Text color="gray" dimColor>
+        ↑↓ navigate{" "}
+      </Text>
+      <Text color="gray" dimColor>
+        enter select{" "}
+      </Text>
+      <Text color="gray" dimColor>
+        ctrl+c exit
+      </Text>
     </Box>
   );
 }
@@ -128,27 +170,59 @@ function ListApp({ initialPrompts, onSelect, onExit }: ListAppProps) {
 
     if (focused === "list") {
       if (key.upArrow) {
-        if (cursor === 0) { setFocused("search"); return; }
+        if (cursor === 0) {
+          setFocused("search");
+          return;
+        }
         setCursor((c) => c - 1);
         return;
       }
-      if (key.downArrow) { setCursor((c) => Math.min(filtered.length - 1, c + 1)); return; }
-      if (key.return && filtered.length > 0) {
-        const selected = filtered[cursor];
-        if (selected) { exit(); onSelect(selected); }
+      if (key.downArrow) {
+        setCursor((c) => Math.min(filtered.length - 1, c + 1));
         return;
       }
-      if (input === "/" || input === "f") { setFocused("search"); return; }
-      if (key.escape || input === "q") { exit(); onExit(); return; }
+      if (key.return && filtered.length > 0) {
+        const selected = filtered[cursor];
+        if (selected) {
+          exit();
+          onSelect(selected);
+        }
+        return;
+      }
+      if (input === "/" || input === "f") {
+        setFocused("search");
+        return;
+      }
+      if (key.escape || input === "q") {
+        exit();
+        onExit();
+        return;
+      }
     }
 
     if (focused === "search") {
-      if (key.downArrow && filtered.length > 0) { setCursor(0); setFocused("list"); return; }
-      if (key.upArrow && filtered.length > 0) { setCursor(filtered.length - 1); setFocused("list"); return; }
-      if (key.return) { setFocused("list"); return; }
+      if (key.downArrow && filtered.length > 0) {
+        setCursor(0);
+        setFocused("list");
+        return;
+      }
+      if (key.upArrow && filtered.length > 0) {
+        setCursor(filtered.length - 1);
+        setFocused("list");
+        return;
+      }
+      if (key.return) {
+        setFocused("list");
+        return;
+      }
       if (key.escape) {
-        if (query.length > 0) { setQuery(""); return; }
-        exit(); onExit(); return;
+        if (query.length > 0) {
+          setQuery("");
+          return;
+        }
+        exit();
+        onExit();
+        return;
       }
     }
   });
@@ -160,12 +234,20 @@ function ListApp({ initialPrompts, onSelect, onExit }: ListAppProps) {
         <Text color="cyan">Search: </Text>
         <TextInput
           value={query}
-          onChange={(val) => { setQuery(val); setFocused("search"); }}
+          onChange={(val) => {
+            setQuery(val);
+            setFocused("search");
+          }}
           onSubmit={() => setFocused("list")}
           placeholder="type to filter..."
           focus={focused === "search"}
         />
-        {query.length > 0 && <Text color="gray" dimColor>  (esc to clear)</Text>}
+        {query.length > 0 && (
+          <Text color="gray" dimColor>
+            {" "}
+            (esc to clear)
+          </Text>
+        )}
       </Box>
       <TableHeader />
       {filtered.length === 0 ? (
@@ -174,7 +256,12 @@ function ListApp({ initialPrompts, onSelect, onExit }: ListAppProps) {
         </Box>
       ) : (
         filtered.map((prompt, i) => (
-          <Row key={prompt.id} prompt={prompt} isSelected={focused === "list" && i === cursor} index={i} />
+          <Row
+            key={prompt.id}
+            prompt={prompt}
+            isSelected={focused === "list" && i === cursor}
+            index={i}
+          />
         ))
       )}
       <Footer count={filtered.length} total={initialPrompts.length} />
@@ -210,12 +297,20 @@ async function runEditFlow(prompt: Prompt): Promise<Prompt> {
         p.select({
           message: chalk.cyan("How would you like to edit the prompt body?"),
           options: [
-            { value: "editor", label: "Open in my default editor", hint: "recommended for longer prompts" },
+            {
+              value: "editor",
+              label: "Open in my default editor",
+              hint: "recommended for longer prompts",
+            },
             { value: "inline", label: "Edit inline" },
           ],
         }),
     },
-    { onCancel: () => { p.cancel(chalk.yellow("Edit cancelled.")); } }
+    {
+      onCancel: () => {
+        p.cancel(chalk.yellow("Edit cancelled."));
+      },
+    },
   );
 
   let body = prompt.body;
@@ -285,7 +380,7 @@ function renderListApp(prompts: Prompt[]): Promise<Prompt | null> {
         initialPrompts={prompts}
         onSelect={(p) => resolve(p)}
         onExit={() => resolve(null)}
-      />
+      />,
     );
   });
 }
@@ -307,7 +402,7 @@ export async function listCommand(): Promise<void> {
       chalk.bgCyan.black.bold(" chatty-caddy ") +
         chalk.yellow(" No prompts saved yet. Run ") +
         chalk.bold("chatty-caddy add") +
-        chalk.yellow(" to create one.")
+        chalk.yellow(" to create one."),
     );
     console.log();
     return;

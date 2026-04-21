@@ -30,7 +30,11 @@ export async function addCommand(): Promise<void> {
         p.select({
           message: chalk.cyan("How would you like to enter the prompt body?"),
           options: [
-            { value: "editor", label: "Open in my default editor", hint: "recommended for longer prompts" },
+            {
+              value: "editor",
+              label: "Open in my default editor",
+              hint: "recommended for longer prompts",
+            },
             { value: "inline", label: "Type inline" },
           ],
         }),
@@ -40,7 +44,7 @@ export async function addCommand(): Promise<void> {
         p.cancel(chalk.yellow("Cancelled."));
         process.exit(0);
       },
-    }
+    },
   );
 
   let body: string | null = null;
@@ -78,8 +82,6 @@ export async function addCommand(): Promise<void> {
   await savePrompt(prompt);
 
   p.outro(
-    chalk.green("✓ Saved: ") +
-      chalk.bold(prompt.label) +
-      chalk.dim(` (${prompt.id.slice(0, 8)})`)
+    chalk.green("✓ Saved: ") + chalk.bold(prompt.label) + chalk.dim(` (${prompt.id.slice(0, 8)})`),
   );
 }

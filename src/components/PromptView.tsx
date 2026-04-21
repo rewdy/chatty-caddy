@@ -24,27 +24,19 @@ const ACTIONS = ["run", "edit", "delete", "back"] as const;
 type ActionId = (typeof ACTIONS)[number];
 
 const ACTION_META: Record<ActionId, { label: string; color: string }> = {
-  run:    { label: "Run",    color: "magenta" },
-  edit:   { label: "Edit",   color: "yellow"  },
-  delete: { label: "Delete", color: "red"     },
-  back:   { label: "← Back", color: "gray"    },
+  run: { label: "Run", color: "magenta" },
+  edit: { label: "Edit", color: "yellow" },
+  delete: { label: "Delete", color: "red" },
+  back: { label: "← Back", color: "gray" },
 };
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
-function ActionBar({
-  selected,
-  state,
-}: {
-  selected: ActionId;
-  state: ViewState;
-}) {
+function ActionBar({ selected, state }: { selected: ActionId; state: ViewState }) {
   const mainActions: ActionId[] = ["run", "edit", "delete"];
-  const isActive = (id: ActionId) =>
-    selected === id && state === "actions";
+  const isActive = (id: ActionId) => selected === id && state === "actions";
   const isEngaged = (id: ActionId) =>
-    (id === "run" && state === "run-picker") ||
-    (id === "delete" && state === "delete-confirm");
+    (id === "run" && state === "run-picker") || (id === "delete" && state === "delete-confirm");
 
   return (
     <Box paddingX={1} paddingY={0} justifyContent="space-between">
@@ -68,7 +60,9 @@ function ActionBar({
         {isActive("back") ? (
           <Text backgroundColor="gray" color="black" bold>{` ← Back `}</Text>
         ) : (
-          <Text color="gray" dimColor>← Back</Text>
+          <Text color="gray" dimColor>
+            ← Back
+          </Text>
         )}
       </Box>
     </Box>
@@ -78,24 +72,34 @@ function ActionBar({
 function Divider() {
   return (
     <Box>
-      <Text color="gray" dimColor>{"─".repeat(88)}</Text>
+      <Text color="gray" dimColor>
+        {"─".repeat(88)}
+      </Text>
     </Box>
   );
 }
 
 function PromptBody({ prompt }: { prompt: Prompt }) {
   const created = new Date(prompt.createdAt).toLocaleDateString("en-US", {
-    year: "numeric", month: "short", day: "numeric",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
   });
 
   return (
     <Box flexDirection="column" paddingX={2} paddingY={1} gap={1}>
       <Box flexDirection="column">
         <Box gap={2}>
-          <Text bold color="cyan">{prompt.label}</Text>
-          <Text color="gray" dimColor>{created}</Text>
+          <Text bold color="cyan">
+            {prompt.label}
+          </Text>
+          <Text color="gray" dimColor>
+            {created}
+          </Text>
         </Box>
-        <Text color="gray" italic>{prompt.description}</Text>
+        <Text color="gray" italic>
+          {prompt.description}
+        </Text>
       </Box>
       <Box marginTop={1}>
         <Text wrap="wrap">{prompt.body}</Text>
@@ -104,14 +108,12 @@ function PromptBody({ prompt }: { prompt: Prompt }) {
   );
 }
 
-function RunPicker({
-  cursor,
-}: {
-  cursor: number;
-}) {
+function RunPicker({ cursor }: { cursor: number }) {
   return (
     <Box flexDirection="column" paddingX={2} paddingY={1} gap={1}>
-      <Text bold color="magenta">Run in...</Text>
+      <Text bold color="magenta">
+        Run in...
+      </Text>
       <Box flexDirection="column">
         {AI_TOOLS.map((tool, i) => (
           <Box key={tool.id}>
@@ -123,21 +125,19 @@ function RunPicker({
           </Box>
         ))}
       </Box>
-      <Text color="gray" dimColor>↑↓ select · enter launch · esc cancel</Text>
+      <Text color="gray" dimColor>
+        ↑↓ select · enter launch · esc cancel
+      </Text>
     </Box>
   );
 }
 
-function DeleteConfirm({
-  promptLabel,
-  cursor,
-}: {
-  promptLabel: string;
-  cursor: number;
-}) {
+function DeleteConfirm({ promptLabel, cursor }: { promptLabel: string; cursor: number }) {
   return (
     <Box flexDirection="column" paddingX={2} paddingY={1} gap={1}>
-      <Text bold color="red">Delete "{promptLabel}"?</Text>
+      <Text bold color="red">
+        Delete "{promptLabel}"?
+      </Text>
       <Text color="gray">This cannot be undone.</Text>
       <Box flexDirection="column" marginTop={1}>
         {["Yes, delete", "No, cancel"].map((opt, i) => (
@@ -150,7 +150,9 @@ function DeleteConfirm({
           </Box>
         ))}
       </Box>
-      <Text color="gray" dimColor>↑↓ select · enter confirm · esc cancel</Text>
+      <Text color="gray" dimColor>
+        ↑↓ select · enter confirm · esc cancel
+      </Text>
     </Box>
   );
 }
@@ -264,7 +266,10 @@ export function PromptView({ prompt, onDone }: Props) {
   return (
     <Box flexDirection="column" marginTop={1}>
       <Box marginBottom={1} paddingX={1}>
-        <Text backgroundColor="cyan" color="black" bold> chatty-caddy </Text>
+        <Text backgroundColor="cyan" color="black" bold>
+          {" "}
+          chatty-caddy{" "}
+        </Text>
         <Text color="cyan"> prompt view</Text>
       </Box>
 
@@ -280,7 +285,9 @@ export function PromptView({ prompt, onDone }: Props) {
 
       <Divider />
       <Box paddingX={2}>
-        <Text color="gray" dimColor>←→ navigate actions · enter select · esc back</Text>
+        <Text color="gray" dimColor>
+          ←→ navigate actions · enter select · esc back
+        </Text>
       </Box>
     </Box>
   );
