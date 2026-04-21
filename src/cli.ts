@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 import chalk from "chalk";
 import { addCommand } from "./commands/add";
-import { listCommand } from "./commands/list";
+import { listCommand } from "./commands/list.tsx";
 
 const [, , command, ...args] = process.argv;
 

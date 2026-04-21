@@ -1,14 +1,18 @@
 import * as p from "@clack/prompts";
 import chalk from "chalk";
-import { randomUUID } from "crypto";
+import { v5 as uuidv5 } from "uuid";
 import { savePrompt } from "../lib/storage";
+import { openInEditor } from "../lib/editor";
 import type { Prompt } from "../types";
+
+// Stable namespace for chatty-caddy prompt IDs
+const NAMESPACE = "6ba7b810-9dad-11d1-80b4-00c04fd430c8"; // UUID v5 DNS namespace
 
 export async function addCommand(): Promise<void> {
   console.log();
   p.intro(chalk.bgCyan.black.bold(" chatty-caddy ") + chalk.cyan(" add a new prompt"));
 
-  const fields = await p.group(
+  const meta = await p.group(
     {
       label: () =>
         p.text({
@@ -22,11 +26,13 @@ export async function addCommand(): Promise<void> {
           placeholder: "e.g. Converts a class component to a functional React component",
           validate: (v) => (!v?.trim() ? "Description is required." : undefined),
         }),
-      body: () =>
-        p.text({
-          message: chalk.cyan("Prompt body"),
-          placeholder: "Paste or type your prompt...",
-          validate: (v) => (!v?.trim() ? "Prompt body is required." : undefined),
+      bodyInput: () =>
+        p.select({
+          message: chalk.cyan("How would you like to enter the prompt body?"),
+          options: [
+            { value: "editor", label: "Open in my default editor", hint: "recommended for longer prompts" },
+            { value: "inline", label: "Type inline" },
+          ],
         }),
     },
     {
@@ -37,11 +43,35 @@ export async function addCommand(): Promise<void> {
     }
   );
 
+  let body: string | null = null;
+
+  if (meta.bodyInput === "editor") {
+    body = await openInEditor();
+    if (!body) {
+      p.cancel(chalk.yellow("No content entered. Prompt was not saved."));
+      process.exit(0);
+    }
+  } else {
+    const inlineBody = await p.text({
+      message: chalk.cyan("Prompt body"),
+      placeholder: "Type your prompt...",
+      validate: (v) => (!v?.trim() ? "Prompt body is required." : undefined),
+    });
+
+    if (p.isCancel(inlineBody)) {
+      p.cancel(chalk.yellow("Cancelled."));
+      process.exit(0);
+    }
+
+    body = inlineBody.trim();
+  }
+
+  const label = meta.label.trim();
   const prompt: Prompt = {
-    id: randomUUID(),
-    label: fields.label.trim(),
-    description: fields.description.trim(),
-    body: fields.body.trim(),
+    id: uuidv5(label, NAMESPACE),
+    label,
+    description: meta.description.trim(),
+    body,
     createdAt: new Date().toISOString(),
   };
 
