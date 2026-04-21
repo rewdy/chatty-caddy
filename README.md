@@ -75,6 +75,6 @@ Supported tools (Claude, Codex, GitHub Copilot) are defined in [`src/lib/tools.t
 
 ```sh
 bun install
-bun src/cli.ts add
-bun src/cli.ts list
+bun run dev add
+bun run dev list
 ```
