@@ -10,8 +10,6 @@ Prompts are saved as Markdown files in `~/.chatty-caddy` with YAML frontmatter â
 npm install -g @rewdy/chatty-caddy
 ```
 
-Requires [Bun](https://bun.sh) to be installed on your system.
-
 ## Usage
 
 Both `chatty-caddy` and the shorter alias `chaca` work for all commands.
@@ -33,8 +31,8 @@ chaca list
 Opens an interactive browser with fuzzy search. From there you can:
 
 - **View** the full prompt body
-- **Edit** any field
 - **Run** the prompt directly in Claude, Codex, or GitHub Copilot
+- **Edit** any field
 - **Delete** a prompt
 
 ### Help
@@ -73,8 +71,17 @@ Supported tools (Claude, Codex, GitHub Copilot) are defined in [`src/lib/tools.t
 
 ## Development
 
+Requires [Bun](https://bun.sh).
+
 ```sh
 bun install
 bun run dev add
 bun run dev list
+```
+
+To build a standalone binary:
+
+```sh
+bun run build
+# outputs dist/chatty-caddy
 ```
