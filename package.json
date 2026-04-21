@@ -6,8 +6,8 @@
   "type": "module",
   "private": false,
   "bin": {
-    "chatty-caddy": "./src/cli.ts",
-    "chaca": "./src/cli.ts"
+    "chatty-caddy": "src/cli.ts",
+    "chaca": "src/cli.ts"
   },
   "scripts": {
     "build": "bun build.ts",
