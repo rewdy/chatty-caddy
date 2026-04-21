@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Box, Text, useInput, useApp } from "ink";
-import { AI_TOOLS } from "../lib/tools";
-import type { Prompt } from "../types";
+import { AI_TOOLS } from "../lib/tools.js";
+import type { Prompt } from "../types.js";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

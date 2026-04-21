@@ -2,24 +2,37 @@
   "name": "@rewdy/chatty-caddy",
   "version": "0.1.0",
   "description": "A CLI notebook for storing and running AI prompts",
-  "module": "src/cli.ts",
   "type": "module",
   "private": false,
-  "bin": {
-    "chatty-caddy": "src/cli.ts",
-    "chaca": "src/cli.ts"
+  "publishConfig": {
+    "access": "public"
   },
+  "license": "MIT",
+  "keywords": ["cli", "ai", "prompts", "notebook", "claude", "codex", "copilot"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rewdy/chatty-caddy"
+  },
+  "bin": {
+    "chatty-caddy": "dist/bin.js",
+    "chaca": "dist/bin.js"
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "bun build.ts",
     "typecheck": "tsc --noEmit",
     "format": "oxfmt src",
     "start": "bun src/cli.ts",
-    "dev": "bun src/cli.ts"
+    "dev": "bun src/cli.ts",
+    "prepublishOnly": "bun run typecheck && bun run build"
   },
   "dependencies": {
     "@clack/prompts": "1.2.0",
     "chalk": "5.6.2",
     "fuse.js": "7.3.0",
+    "glob": "13.0.6",
     "gray-matter": "4.0.3",
     "ink": "7.0.1",
     "ink-text-input": "6.0.0",
@@ -29,6 +42,7 @@
   "devDependencies": {
     "@types/bun": "latest",
     "@types/react": "19.2.14",
+    "esbuild": "0.28.0",
     "oxfmt": "0.46.0"
   },
   "peerDependencies": {
@@ -36,5 +50,8 @@
   },
   "patchedDependencies": {
     "ink@7.0.1": "patches/ink@7.0.1.patch"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

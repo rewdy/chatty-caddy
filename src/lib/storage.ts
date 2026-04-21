@@ -1,8 +1,9 @@
 import { homedir } from "os";
 import { join } from "path";
-import { mkdir } from "fs/promises";
+import { mkdir, writeFile, readFile, unlink } from "fs/promises";
+import { glob } from "glob";
 import matter from "gray-matter";
-import type { Prompt } from "../types";
+import type { Prompt } from "../types.js";
 
 const CONFIG_DIR = join(homedir(), ".chatty-caddy");
 
@@ -41,18 +42,17 @@ function parsePrompt(content: string): Prompt | null {
 
 export async function savePrompt(prompt: Prompt): Promise<void> {
   await ensureConfigDir();
-  await Bun.write(promptToFilename(prompt.id), promptToMarkdown(prompt));
+  await writeFile(promptToFilename(prompt.id), promptToMarkdown(prompt), "utf8");
 }
 
 export async function loadAllPrompts(): Promise<Prompt[]> {
   await ensureConfigDir();
 
-  const glob = new Bun.Glob("*.md");
-  const files = await Array.fromAsync(glob.scan({ cwd: CONFIG_DIR, absolute: true }));
+  const files = await glob("*.md", { cwd: CONFIG_DIR, absolute: true });
 
   const prompts: Prompt[] = [];
   for (const file of files) {
-    const content = await Bun.file(file).text();
+    const content = await readFile(file, "utf8");
     const prompt = parsePrompt(content);
     if (prompt) prompts.push(prompt);
   }
@@ -61,8 +61,7 @@ export async function loadAllPrompts(): Promise<Prompt[]> {
 }
 
 export async function deletePrompt(id: string): Promise<void> {
-  const proc = Bun.spawn(["rm", "-f", promptToFilename(id)]);
-  await proc.exited;
+  await unlink(promptToFilename(id));
 }
 
 export async function updatePrompt(prompt: Prompt): Promise<void> {

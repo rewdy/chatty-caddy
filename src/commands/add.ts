@@ -1,9 +1,9 @@
 import * as p from "@clack/prompts";
 import chalk from "chalk";
 import { v5 as uuidv5 } from "uuid";
-import { savePrompt } from "../lib/storage";
-import { openInEditor } from "../lib/editor";
-import type { Prompt } from "../types";
+import { savePrompt } from "../lib/storage.js";
+import { openInEditor } from "../lib/editor.js";
+import type { Prompt } from "../types.js";
 
 // Stable namespace for chatty-caddy prompt IDs
 const NAMESPACE = "6ba7b810-9dad-11d1-80b4-00c04fd430c8"; // UUID v5 DNS namespace

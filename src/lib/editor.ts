@@ -2,7 +2,8 @@ import * as p from "@clack/prompts";
 import chalk from "chalk";
 import { tmpdir } from "os";
 import { join } from "path";
-import { unlink } from "fs/promises";
+import { unlink, writeFile, readFile } from "fs/promises";
+import { spawnSync, spawn } from "child_process";
 
 const EDITOR_FALLBACKS = ["vim", "nano", "vi"];
 
@@ -15,8 +16,8 @@ function resolveEditor(): { bin: string; args: string[] } | null {
   }
 
   for (const fallback of EDITOR_FALLBACKS) {
-    const result = Bun.spawnSync(["which", fallback]);
-    if (result.exitCode === 0) return { bin: fallback, args: [] };
+    const result = spawnSync("which", [fallback], { encoding: "utf8" });
+    if (result.status === 0) return { bin: fallback, args: [] };
   }
 
   return null;
@@ -39,22 +40,22 @@ export async function openInEditor(initialContent = ""): Promise<string | null> 
   const editorName = editor.bin.split("/").pop() ?? editor.bin;
   const tmpFile = join(tmpdir(), `chatty-caddy-${Date.now()}.md`);
 
-  await Bun.write(tmpFile, initialContent);
+  await writeFile(tmpFile, initialContent, "utf8");
 
   p.log.step(
     chalk.cyan(`Opening in ${chalk.bold(editorName)}`) +
       chalk.dim(" — save and close the file when done."),
   );
 
-  // Small pause so the user can read the message before the editor takes over
-  await Bun.sleep(600);
+  await new Promise<void>((resolve) => setTimeout(resolve, 600));
 
-  const proc = Bun.spawn([editor.bin, ...editor.args, tmpFile], {
-    stdio: ["inherit", "inherit", "inherit"],
+  await new Promise<void>((resolve, reject) => {
+    const proc = spawn(editor.bin, [...editor.args, tmpFile], { stdio: "inherit" });
+    proc.on("close", resolve);
+    proc.on("error", reject);
   });
-  await proc.exited;
 
-  const content = await Bun.file(tmpFile).text();
+  const content = await readFile(tmpFile, "utf8");
   await unlink(tmpFile).catch(() => {});
 
   const trimmed = content.trim();

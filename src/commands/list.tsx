@@ -3,12 +3,13 @@ import { render, Box, Text, useInput, useApp } from "ink";
 import TextInput from "ink-text-input";
 import Fuse from "fuse.js";
 import chalk from "chalk";
+import { spawn } from "child_process";
 import * as p from "@clack/prompts";
-import { loadAllPrompts, deletePrompt, updatePrompt } from "../lib/storage";
-import { openInEditor } from "../lib/editor";
-import { AI_TOOLS } from "../lib/tools";
-import { PromptView, type ViewResult } from "../components/PromptView";
-import type { Prompt } from "../types";
+import { loadAllPrompts, deletePrompt, updatePrompt } from "../lib/storage.js";
+import { openInEditor } from "../lib/editor.js";
+import { AI_TOOLS } from "../lib/tools.js";
+import { PromptView, type ViewResult } from "../components/PromptView.js";
+import type { Prompt } from "../types.js";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -352,23 +353,20 @@ async function runTool(prompt: Prompt, toolId: string): Promise<void> {
   console.log(chalk.dim(`  Launching ${chalk.bold(tool.label)}...`));
   console.log();
 
-  if (tool.inputMethod === "arg") {
-    cmdArgs.push(prompt.body);
-    const proc = Bun.spawn([cmd, ...cmdArgs], { stdio: ["inherit", "inherit", "inherit"] });
-    await proc.exited;
-  } else {
-    const enc = new TextEncoder();
-    const proc = Bun.spawn([cmd, ...cmdArgs], {
-      stdin: new ReadableStream({
-        start(controller) {
-          controller.enqueue(enc.encode(prompt.body));
-          controller.close();
-        },
-      }),
-      stdio: [undefined, "inherit", "inherit"],
-    });
-    await proc.exited;
-  }
+  await new Promise<void>((resolve, reject) => {
+    if (tool.inputMethod === "arg") {
+      cmdArgs.push(prompt.body);
+      const proc = spawn(cmd, cmdArgs, { stdio: "inherit" });
+      proc.on("close", resolve);
+      proc.on("error", reject);
+    } else {
+      const proc = spawn(cmd, cmdArgs, { stdio: ["pipe", "inherit", "inherit"] });
+      proc.stdin?.write(prompt.body);
+      proc.stdin?.end();
+      proc.on("close", resolve);
+      proc.on("error", reject);
+    }
+  });
 }
 
 // ─── Render helpers ───────────────────────────────────────────────────────────
