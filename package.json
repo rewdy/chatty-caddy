@@ -1,6 +1,6 @@
 {
   "name": "@rewdy/chatty-caddy",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A CLI notebook for storing and running AI prompts",
   "type": "module",
   "private": false,
@@ -8,10 +8,18 @@
     "access": "public"
   },
   "license": "MIT",
-  "keywords": ["cli", "ai", "prompts", "notebook", "claude", "codex", "copilot"],
+  "keywords": [
+    "cli",
+    "ai",
+    "prompts",
+    "notebook",
+    "claude",
+    "codex",
+    "copilot"
+  ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/rewdy/chatty-caddy"
+    "url": "git+https://github.com/rewdy/chatty-caddy.git"
   },
   "bin": {
     "chatty-caddy": "dist/bin.js",
