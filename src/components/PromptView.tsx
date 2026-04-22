@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { Box, Text, useInput, useApp } from "ink";
 import { AI_TOOLS } from "../lib/tools.js";
+import { copyToClipboard } from "../lib/clipboard.js";
 import type { Prompt } from "../types.js";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type ViewState = "actions" | "run-picker" | "delete-confirm";
+type CopyStatus = "idle" | "copied" | "error";
 
 export type ViewResult =
   | { action: "edit" }
@@ -20,11 +22,12 @@ interface Props {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const ACTIONS = ["run", "edit", "delete", "back"] as const;
+const ACTIONS = ["run", "copy", "edit", "delete", "back"] as const;
 type ActionId = (typeof ACTIONS)[number];
 
 const ACTION_META: Record<ActionId, { label: string; color: string }> = {
   run: { label: "Run", color: "magenta" },
+  copy: { label: "Copy", color: "green" },
   edit: { label: "Edit", color: "yellow" },
   delete: { label: "Delete", color: "red" },
   back: { label: "← Back", color: "gray" },
@@ -32,25 +35,47 @@ const ACTION_META: Record<ActionId, { label: string; color: string }> = {
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
-function ActionBar({ selected, state }: { selected: ActionId; state: ViewState }) {
-  const mainActions: ActionId[] = ["run", "edit", "delete"];
+function ActionBar({
+  selected,
+  state,
+  copyStatus,
+}: {
+  selected: ActionId;
+  state: ViewState;
+  copyStatus: CopyStatus;
+}) {
+  const mainActions: ActionId[] = ["run", "copy", "edit", "delete"];
   const isActive = (id: ActionId) => selected === id && state === "actions";
   const isEngaged = (id: ActionId) =>
     (id === "run" && state === "run-picker") || (id === "delete" && state === "delete-confirm");
+
+  const labelFor = (id: ActionId): string => {
+    if (id === "copy") {
+      if (copyStatus === "copied") return "Copied!";
+      if (copyStatus === "error") return "Copy failed";
+    }
+    return ACTION_META[id].label;
+  };
 
   return (
     <Box paddingX={1} paddingY={0} justifyContent="space-between">
       <Box gap={1}>
         {mainActions.map((id) => {
-          const { label, color } = ACTION_META[id];
+          const { color } = ACTION_META[id];
+          const label = labelFor(id);
           const active = isActive(id);
           const engaged = isEngaged(id);
+          const displayColor = id === "copy" && copyStatus === "error" ? "red" : color;
           return (
             <Box key={id}>
               {active || engaged ? (
-                <Text backgroundColor={color} color="black" bold>{` ${label} `}</Text>
+                <Text
+                  backgroundColor={displayColor}
+                  color="black"
+                  bold
+                >{` ${label} `}</Text>
               ) : (
-                <Text color={color}>{`[ ${label} ]`}</Text>
+                <Text color={displayColor}>{`[ ${label} ]`}</Text>
               )}
             </Box>
           );
@@ -164,8 +189,15 @@ export function PromptView({ prompt, onDone }: Props) {
   const [selectedAction, setSelectedAction] = useState<ActionId>("run");
   const [viewState, setViewState] = useState<ViewState>("actions");
   const [subCursor, setSubCursor] = useState(0);
+  const [copyStatus, setCopyStatus] = useState<CopyStatus>("idle");
 
   const actionIndex = ACTIONS.indexOf(selectedAction);
+
+  const handleCopy = async () => {
+    const ok = await copyToClipboard(prompt.body);
+    setCopyStatus(ok ? "copied" : "error");
+    setTimeout(() => setCopyStatus("idle"), 1500);
+  };
 
   useInput((input, key) => {
     if (key.ctrl && input === "c") {
@@ -205,6 +237,10 @@ export function PromptView({ prompt, onDone }: Props) {
         if (selectedAction === "run") {
           setSubCursor(0);
           setViewState("run-picker");
+          return;
+        }
+        if (selectedAction === "copy") {
+          void handleCopy();
           return;
         }
         if (selectedAction === "delete") {
@@ -274,7 +310,7 @@ export function PromptView({ prompt, onDone }: Props) {
       </Box>
 
       <Divider />
-      <ActionBar selected={selectedAction} state={viewState} />
+      <ActionBar selected={selectedAction} state={viewState} copyStatus={copyStatus} />
       <Divider />
 
       {viewState === "actions" && <PromptBody prompt={prompt} />}
